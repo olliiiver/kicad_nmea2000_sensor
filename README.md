@@ -10,11 +10,17 @@ Can be used to create a NMEA 2000 device like a sensor for fuel gauges. The boar
 
 ![PHOTO](/sensor2.jpg)
 
+## Prerequisites
+
+- A NMEA2000 or Seatalk NG network
+- PlatformIO CLI from https://platformio.org
+- A PCB manufacturer of your choice and some SMD soldering experience 
+
 ## How to
 
 ### PCB
 
-Equip SMD parts for power (LDO, etc) first and measure input to output voltage carefully. Adjust R4 (and R3) resitors, if necessary. If voltage is around 4.8V - 5V, place other parts. 
+Equip SMD parts for power (LDO, etc) first and measure input to output voltage carefully. Adjust R4 (and R3) resistors, if necessary. If voltage is around 4.8V - 5V, place other parts. 
 
 ### Burn bootloader
 
