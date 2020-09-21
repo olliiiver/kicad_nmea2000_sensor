@@ -22,8 +22,10 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 
   // Set Product information
-  // NMEA2000.SetN2kCANSendFrameBufSize(100);
-  // NMEA2000.SetN2kCANReceiveFrameBufSize(100);
+  //NMEA2000.SetN2kCANSendFrameBufSize(50);
+  //NMEA2000.SetN2kCANReceiveFrameBufSize(2);
+  NMEA2000.SetN2kCANMsgBufSize(1);
+
   NMEA2000.SetProductInformation("00001337", // Manufacturer's Model serial code
                                  100, // Manufacturer's product code
                                  "Message sender example",  // Manufacturer's Model ID
@@ -41,15 +43,15 @@ void setup() {
   OutputStream=&Serial;
 
   // logging
-  NMEA2000.SetForwardStream(&Serial);  // PC output on due programming port
-  NMEA2000.SetForwardType(tNMEA2000::fwdt_Text); // Show in clear text. Leave uncommented for default Actisense format.
-  NMEA2000.SetForwardOwnMessages();
+  // NMEA2000.SetForwardStream(&Serial);  // PC output on due programming port
+  // NMEA2000.SetForwardType(tNMEA2000::fwdt_Text); // Show in clear text. Leave uncommented for default Actisense format.
+  // NMEA2000.SetForwardOwnMessages();
 
   // If you also want to see all traffic on the bus use N2km_ListenAndNode instead of N2km_NodeOnly below
   NMEA2000.SetMode(tNMEA2000::N2km_NodeOnly,22);
 
-  NMEA2000.EnableForward(false); // Disable all msg forwarding to USB (=Serial)
-  //NMEA2000.ExtendTransmitMessages(TransmitMessages);
+  // NMEA2000.EnableForward(false); // Disable all msg forwarding to USB (=Serial)
+  NMEA2000.ExtendTransmitMessages(TransmitMessages);
   NMEA2000.Open();
 
   digitalWrite(LED_BUILTIN, HIGH);
@@ -66,11 +68,36 @@ void SendN2kSlowData() {
   int raw = 0;
   int percent = 0;
   float R1 = 1000; // known 1k
+  float max = 160; // max sensor range (0 - 190 ohm)
 
   if (SlowDataUpdated+SlowDataUpdatePeriod<millis()) {
     SlowDataUpdated=millis();
     raw = analogRead(0);
-    percent = 100 - (raw / R1 * 100);
+    // percent = 100 - (raw / R1 * 100);
+    //    percent = (raw / max * 100);
+    if (raw < 15) {
+      percent = 0;
+    } else if (raw >= 15 && raw < 32) {
+      percent = 10;
+    } else if (raw >= 32 && raw < 50) {
+      percent = 15;
+    } else if (raw >= 50 && raw < 60) {
+      percent = 20;
+    } else if (raw >= 60 && raw < 70) {
+      percent = 25;
+    } else if (raw >= 70 && raw < 80) {
+      percent = 30;
+    } else if (raw >= 80 && raw < 105) {
+      percent = 40;
+    } else if (raw >= 105 && raw < 130) {
+      percent = 50;
+    } else if (raw >= 130 && raw < 155) {
+      percent = 75;
+    } else if (raw >= 155) {
+      percent = 100;
+    }
+
+
     percent = (percent > 100) ? 100 : percent;
     percent = (percent < 1) ? 0 : percent;
     OutputStream->print("===> raw: ");
